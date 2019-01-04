@@ -85,9 +85,4 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         firebaseAuth.addAuthStateListener(authStateListener);
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
 }
