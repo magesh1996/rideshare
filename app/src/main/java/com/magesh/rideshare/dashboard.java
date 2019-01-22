@@ -1,9 +1,11 @@
 package com.magesh.rideshare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,11 @@ import android.view.ViewGroup;
  * Use the {@link dashboard#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class dashboard extends Fragment {
+public class dashboard extends Fragment implements View.OnClickListener {
+
+    private View v;
+    private CardView askride, giveride;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -53,6 +59,7 @@ public class dashboard extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -64,7 +71,12 @@ public class dashboard extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dashboard, container, false);
+        v =  inflater.inflate(R.layout.fragment_dashboard, container, false);
+        askride = v.findViewById(R.id.askridecard);
+        giveride = v.findViewById(R.id.giveridecard);
+        askride.setOnClickListener(this);
+        giveride.setOnClickListener(this);
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -85,6 +97,18 @@ public class dashboard extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.askridecard:
+                startActivity(new Intent(getActivity(),DrivermapActivity.class));
+            case R.id.giveridecard:
+                startActivity(new Intent(getActivity(),DrivermapActivity.class));
+        }
+
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
