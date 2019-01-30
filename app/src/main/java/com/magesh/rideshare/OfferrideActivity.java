@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-public class AskrideActivity extends AppCompatActivity implements View.OnClickListener {
+public class OfferrideActivity extends AppCompatActivity implements View.OnClickListener {
 
     private int mYear, mMonth, mDay;
     final Calendar myCalender = Calendar.getInstance();
@@ -24,7 +24,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_askride);
+        setContentView(R.layout.activity_offerride);
 
         editText2 = findViewById(R.id.editText2);
         button = findViewById(R.id.button);
@@ -59,7 +59,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         if (v == button){
-            startActivity(new Intent(this, RequestormapActivity.class));
+            startActivity(new Intent(this, DrivermapActivity.class));
         }
 
     }

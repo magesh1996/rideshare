@@ -58,6 +58,7 @@ public class logout extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(getActivity(),MainActivity.class));
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AskrideActivity">
+    tools:context=".OfferrideActivity">
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search for a ride,"
+            android:text="Offer a ride,"
             android:textStyle="bold|italic"
             android:textSize="25dp"/>
         <android.support.design.widget.TextInputLayout
@@ -61,7 +61,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:hint="No. of Seats"/>
+                android:hint="Departure"/>
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/editText4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:hint="Car"/>
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/editText5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:hint="Seats Available"/>
         </android.support.design.widget.TextInputLayout>
         <Button
             android:id="@+id/button"
@@ -70,7 +90,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="30dp"
             android:background="@drawable/roundedcornerbutton"
-            android:text="Search" />
+            android:text="Offer" />
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

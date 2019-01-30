@@ -100,15 +100,13 @@ public class dashboard extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.askridecard:
-                startActivity(new Intent(getActivity(),DrivermapActivity.class));
-            case R.id.giveridecard:
-                startActivity(new Intent(getActivity(),DrivermapActivity.class));
+        if (v == askride){
+            startActivity(new Intent(getActivity(), AskrideActivity.class));
         }
-
+        if (v == giveride){
+            startActivity(new Intent(getActivity(),OfferrideActivity.class));
+        }
     }
-
 
     /**
      * This interface must be implemented by activities that contain this
