@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "1012529924248-k21kv61d00jehms5b104u1hdvpa4pk2o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.magesh.rideshare",
+            "certificate_hash": "9f8239b954bd955baae1f97613c319cda9f3c439"
+          }
+        },
+        {
           "client_id": "1012529924248-ha0vc3t1r7b6sd9j6kv9htmt1inb9bef.apps.googleusercontent.com",
           "client_type": 3
         }

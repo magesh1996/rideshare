@@ -27,11 +27,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     ImageView userPhoto;
     static int preqCode = 1;
@@ -54,111 +56,58 @@ public class RegisterActivity extends AppCompatActivity {
         email = findViewById(R.id.editText1);
         pwd = findViewById(R.id.editText2);
         mobile = findViewById(R.id.editText3);
+
         regbutton = findViewById(R.id.button);
         gotologin = findViewById(R.id.textView1);
+
+        regbutton.setOnClickListener(this);
+        gotologin.setOnClickListener(this);
+
         loadingprogress = findViewById(R.id.progressBar);
         loadingprogress.setVisibility(View.INVISIBLE);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        regbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                regbutton.setVisibility(View.INVISIBLE);
-                loadingprogress.setVisibility(View.VISIBLE);
-                final String uname = name.getText().toString();
-                final String uemail = email.getText().toString();
-                final String upwd = pwd.getText().toString();
-                final String umobile = mobile.getText().toString();
-
-                if(uname.isEmpty() || uemail.isEmpty() || upwd.isEmpty() || umobile.isEmpty()){
-                    showMessage("Please verify all fields");
-                    regbutton.setVisibility(View.VISIBLE);
-                    loadingprogress.setVisibility(View.INVISIBLE);
-                }
-                else {
-                    CreateUserAccount(uname,uemail,upwd);
-                }
-
-            }
-        });
-
-        gotologin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(RegisterActivity.this,MainActivity.class));
-            }
-        });
-
-
-        userPhoto = findViewById(R.id.imageView);
-        userPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(Build.VERSION.SDK_INT >= 22){
-                    checkAndRequestForPermission();
-                }
-                else{
-                    openGallery();
-                }
-            }
-        });
-
     }
 
-    private void CreateUserAccount(final String uname, String uemail, String upwd) {
-        firebaseAuth.createUserWithEmailAndPassword(uemail,upwd).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+    public void registerUser(){
+
+        final String uname = name.getText().toString();
+        final String uemail = email.getText().toString();
+        String upwd = pwd.getText().toString();
+        final String umobile = mobile.getText().toString();
+
+        if(uname.isEmpty() || uemail.isEmpty() || upwd.isEmpty() || umobile.isEmpty()){
+            showMessage("Please verify all fields");
+            regbutton.setVisibility(View.VISIBLE);
+            loadingprogress.setVisibility(View.INVISIBLE);
+        }
+
+        firebaseAuth.createUserWithEmailAndPassword(uemail,upwd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
-                    showMessage("Account created");
-                    updateUserInfo(uname,pickedImgUri,firebaseAuth.getCurrentUser());
+
+                Users users = null;
+                if (task.isSuccessful()) {
+                    users = new Users(uname, uemail, umobile);
+                    FirebaseDatabase.getInstance().getReference("users")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .setValue(users).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                showMessage("Successfully registered");
+                            } else {
+                                showMessage("Registration failed");
+                            }
+                        }
+                    });
                 }
                 else {
-                    showMessage("Account creation failed"+task.getException().getMessage());
-                    regbutton.setVisibility(View.VISIBLE);
-                    loadingprogress.setVisibility(View.INVISIBLE);
+                    showMessage("Failed");
                 }
             }
         });
-
-    }
-
-    private void updateUserInfo(final String uname, Uri pickedImgUri, final FirebaseUser currentUser) {
-        StorageReference refStorage = FirebaseStorage.getInstance().getReference().child("userPhoto");
-        final StorageReference imgFilePath = refStorage.child(pickedImgUri.getLastPathSegment());
-        imgFilePath.putFile(pickedImgUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                imgFilePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(uname)
-                                .setPhotoUri(uri)
-                                .build();
-
-                        currentUser.updateProfile(profileUpdate)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()){
-                                            showMessage("Registration Completed");
-                                            updateUI();
-                                        }
-                                    }
-                                });
-                    }
-                });
-            }
-        });
-
-    }
-
-    private void updateUI() {
-        Intent loginActivity = new Intent(getApplicationContext(),MainActivity.class);
-        startActivity(loginActivity);
-        finish();
 
     }
 
@@ -166,35 +115,13 @@ public class RegisterActivity extends AppCompatActivity {
         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_LONG).show();
     }
 
-    private void checkAndRequestForPermission() {
-        if(ContextCompat.checkSelfPermission(RegisterActivity.this,Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            if(ActivityCompat.shouldShowRequestPermissionRationale(RegisterActivity.this,Manifest.permission.READ_EXTERNAL_STORAGE)){
-                Toast.makeText(RegisterActivity.this,"Please accept for required permission",Toast.LENGTH_SHORT).show();
-            }
-            else {
-                ActivityCompat.requestPermissions(RegisterActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},preqCode);
-            }
-        }
-        else {
-            openGallery();
-        }
-
-    }
-
-    private void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent,reqCode);
-
-    }
-
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == reqCode && data != null){
-            pickedImgUri = data.getData();
-            userPhoto.setImageURI(pickedImgUri);
+    public void onClick(View v) {
+        if (v == regbutton){
+            registerUser();
+        }
+        if (v == gotologin){
+            startActivity(new Intent(this,MainActivity.class));
         }
     }
 }
