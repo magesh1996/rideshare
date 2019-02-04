@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".OfferrideActivity">
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
@@ -12,7 +13,6 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingTop="20dp">
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,7 +32,6 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <EditText
                 android:id="@+id/editText1"
                 android:layout_width="match_parent"

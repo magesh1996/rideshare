@@ -2,6 +2,8 @@ package com.magesh.rideshare;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.support.annotation.NonNull;
@@ -9,6 +11,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -20,13 +24,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class DrivermapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+public class DrivermapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
     private GoogleMap mMap;
     GoogleApiClient googleApiClient;
@@ -37,6 +43,7 @@ public class DrivermapActivity extends FragmentActivity implements OnMapReadyCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drivermap);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -89,13 +96,19 @@ public class DrivermapActivity extends FragmentActivity implements OnMapReadyCal
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
+        BitmapDrawable bitmapdraw = (BitmapDrawable)getResources().getDrawable(R.drawable.carpinpoint);
+        Bitmap marker = bitmapdraw.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(marker,60,100,false);
 
         LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+        mMap.clear();
+        mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(smallMarker)).flat(true));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+
 
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("requests");
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("offers");
 
         GeoFire geoFire = new GeoFire(dbRef);
         geoFire.setLocation(userid, new GeoLocation(location.getLatitude(),location.getLongitude()));
@@ -138,7 +151,7 @@ public class DrivermapActivity extends FragmentActivity implements OnMapReadyCal
         super.onStop();
 
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("requests");
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("offers");
 
         GeoFire geoFire = new GeoFire(dbRef);
         geoFire.removeLocation(userid);
