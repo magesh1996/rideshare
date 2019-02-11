@@ -11,34 +11,41 @@
         android:orientation="vertical"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:paddingTop="20dp">
-
+        android:paddingTop="20dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:clickable="true">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Search for a ride,"
+            android:text="Request for a ride,"
             android:textStyle="bold|italic"
             android:textSize="25dp"/>
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <EditText
                 android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:hint="From"/>
+                android:editable="false"
+                android:focusable="false"
+                android:hint="Pick Up"
+                android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <EditText
                 android:id="@+id/editText1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="To"
-                android:singleLine="true" />
+                android:hint="Drop Off"
+                android:singleLine="true"
+                android:editable="false"
+                android:focusable="false"/>
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -61,7 +68,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:hint="No. of Seats"/>
+                android:hint="Seats Required"
+                android:editable="false"
+                android:focusable="false"/>
         </android.support.design.widget.TextInputLayout>
         <Button
             android:id="@+id/button"
@@ -70,7 +79,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="30dp"
             android:background="@drawable/roundedcornerbutton"
-            android:text="Search" />
+            android:text="Request" />
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
