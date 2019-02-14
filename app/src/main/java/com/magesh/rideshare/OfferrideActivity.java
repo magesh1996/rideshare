@@ -92,7 +92,7 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
         }
 
         if (v == button){
-            startActivity(new Intent(this, DrivermapActivity.class));
+            startActivity(new Intent(this, Mapfordriver.class));
         }
 
         if (v == editText){

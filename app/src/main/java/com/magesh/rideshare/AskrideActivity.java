@@ -143,7 +143,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         if (v == button){
-            startActivity(new Intent(this, RequestormapActivity.class));
+            startActivity(new Intent(this, Mapforrequestor.class));
         }
 
     }
