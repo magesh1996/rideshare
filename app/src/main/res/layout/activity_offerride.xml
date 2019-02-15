@@ -31,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="false"
+                android:focusable="true"
                 android:hint="Origin"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
@@ -45,7 +45,7 @@
                 android:singleLine="true"
                 android:hint="Destination"
                 android:clickable="true"
-                android:focusable="false"/>
+                android:focusable="true" />
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"

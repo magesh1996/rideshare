@@ -157,9 +157,10 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
         latLng = new LatLng(location.getLatitude(),location.getLongitude());
 
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("offers");
+        String cloc = "cloc";
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(userid);
 
         GeoFire geoFire = new GeoFire(dbRef);
-        geoFire.setLocation(userid, new GeoLocation(location.getLatitude(),location.getLongitude()));
+        geoFire.setLocation(cloc, new GeoLocation(location.getLatitude(),location.getLongitude()));
     }
 }

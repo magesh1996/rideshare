@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,13 +15,20 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -35,7 +43,7 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
     private int mYear, mMonth, mDay;
     final Calendar myCalender = Calendar.getInstance();
 
-    EditText editText, editText1, editText2, editText3, editText4;
+    EditText editText, editText1, editText2, editText3, editText4, editText5;
     Button button;
 
     String origin;
@@ -51,6 +59,7 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
         editText2 = findViewById(R.id.editText2);
         editText3 = findViewById(R.id.editText3);
         editText4 = findViewById(R.id.editText4);
+        editText5 = findViewById(R.id.editText5);
         button = findViewById(R.id.button);
 
         editText.setOnClickListener(this);
@@ -61,7 +70,6 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
         button.setOnClickListener(this);
 
         Places.initialize(getApplicationContext(), "AIzaSyBNOGGHYlXOJ44JTyGYAMXCKXTnheWtouk");
-
 
     }
 
@@ -92,7 +100,7 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
         }
 
         if (v == button){
-            startActivity(new Intent(this, Mapfordriver.class));
+            offerRide();
         }
 
         if (v == editText){
@@ -169,6 +177,43 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
         }
 
 
+    }
+
+    private void offerRide() {
+        String ori = editText.getText().toString();
+        String des = editText1.getText().toString();
+        String dor = editText2.getText().toString();
+        String dep = editText3.getText().toString();
+        String sa = editText4.getText().toString();
+        String car = editText5.getText().toString();
+
+        if(ori.isEmpty() || des.isEmpty() || dor.isEmpty() || dep.isEmpty() || sa.isEmpty() || car.isEmpty()){
+            showMessage("Please verify all fields");
+        }
+
+        else {
+            Offer offer = null;
+            offer = new Offer(ori, des, dor, dep, sa, car);
+
+            FirebaseDatabase.getInstance().getReference().child("offers").push()
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .setValue(offer).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        showMessage("You offered your ride");
+
+                    } else {
+                        showMessage("Can't offer your ride");
+                    }
+                }
+            });
+            startActivity(new Intent(this, Mapfordriver.class));
+        }
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -1,15 +1,8 @@
 package com.magesh.rideshare;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,17 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -77,37 +64,41 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         String upwd = pwd.getText().toString();
         final String umobile = mobile.getText().toString();
 
-        if(uname.isEmpty() || uemail.isEmpty() || upwd.isEmpty() || umobile.isEmpty()){
+        if(uname.isEmpty() || uemail.isEmpty() || upwd.isEmpty() || umobile.isEmpty()) {
+
             showMessage("Please verify all fields");
             regbutton.setVisibility(View.VISIBLE);
             loadingprogress.setVisibility(View.INVISIBLE);
         }
 
-        firebaseAuth.createUserWithEmailAndPassword(uemail,upwd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+        else {
+            firebaseAuth.createUserWithEmailAndPassword(uemail,upwd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
 
-                Users users = null;
-                if (task.isSuccessful()) {
-                    users = new Users(uname, uemail, umobile);
-                    FirebaseDatabase.getInstance().getReference("users")
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .setValue(users).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                showMessage("Successfully registered");
-                            } else {
-                                showMessage("Registration failed");
+                    Users users = null;
+                    if (task.isSuccessful()) {
+                        users = new Users(uname, uemail, umobile);
+                        FirebaseDatabase.getInstance().getReference("users")
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .setValue(users).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    showMessage("Successfully registered");
+                                } else {
+                                    showMessage("Registration failed");
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        showMessage("Failed");
+                    }
                 }
-                else {
-                    showMessage("Failed");
-                }
-            }
-        });
+            });
+        }
+
 
     }
 

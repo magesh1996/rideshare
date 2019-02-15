@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         editText1 = findViewById(R.id.editText1);
         button = findViewById(R.id.button);
         textView1 = findViewById(R.id.textView1);
+
         firebaseAuth = FirebaseAuth.getInstance();
         authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -52,21 +53,27 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String email = editText.getText().toString();
                 String password = editText1.getText().toString();
 
-                firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(!task.isSuccessful()){
-                            Toast.makeText(MainActivity.this,"Not Successful",Toast.LENGTH_SHORT).show();
+                if(email.isEmpty() || password.isEmpty()){
+                    Toast.makeText(MainActivity.this,"Invalid Credentials!",Toast.LENGTH_SHORT).show();
+                }
+                else {
+
+                    firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (!task.isSuccessful()) {
+                                Toast.makeText(MainActivity.this, "Not Successful", Toast.LENGTH_SHORT).show();
+                            } else {
+                                startActivity(new Intent(MainActivity.this, UserActivity.class));
+                                finish();
+                            }
                         }
-                        else{
-                            startActivity(new Intent(MainActivity.this,UserActivity.class));
-                            finish();
-                        }
-                    }
-                });
+                    });
+                }
 
             }
         });
