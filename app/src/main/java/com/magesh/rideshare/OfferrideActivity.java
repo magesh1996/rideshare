@@ -46,8 +46,8 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
     EditText editText, editText1, editText2, editText3, editText4, editText5;
     Button button;
 
-    String origin;
-    String destination;
+    String origin, orilatlng;
+    String destination, deslatlng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -193,7 +193,7 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
 
         else {
             Offer offer = null;
-            offer = new Offer(ori, des, dor, dep, sa, car);
+            offer = new Offer(ori, des, dor, dep, sa, car, orilatlng, deslatlng);
 
             FirebaseDatabase.getInstance().getReference().child("offers").push()
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -223,6 +223,7 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 origin = place.getName().toString();
                 editText.setText(origin);
+                orilatlng = place.getLatLng().toString();
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -236,6 +237,8 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 destination = place.getName().toString();
                 editText1.setText(destination);
+                deslatlng = place.getLatLng().toString();
+
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);

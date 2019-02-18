@@ -31,7 +31,6 @@
                 android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:editable="false"
                 android:hint="Pick Up"
                 android:singleLine="true"
                 android:focusable="true"/>
@@ -45,7 +44,6 @@
                 android:layout_height="wrap_content"
                 android:hint="Drop Off"
                 android:singleLine="true"
-                android:editable="false"
                 android:focusable="true"/>
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout

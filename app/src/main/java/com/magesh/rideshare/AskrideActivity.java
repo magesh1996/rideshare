@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,13 +13,18 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -37,7 +43,8 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
     EditText editText, editText1, editText2, editText3;
     Button button;
 
-    String pickup, dropoff;
+    String pickup, piclatlng;
+    String dropoff, drolatlng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,9 +150,44 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         if (v == button){
-            startActivity(new Intent(this, Mapforrequestor.class));
+            askRide();
         }
 
+    }
+
+    private void askRide() {
+        String pic = editText.getText().toString();
+        String dro = editText1.getText().toString();
+        String dor = editText2.getText().toString();
+        String sr = editText3.getText().toString();
+
+        if(pic.isEmpty() || dro.isEmpty() || dor.isEmpty() || sr.isEmpty()){
+            showMessage("Please verify all fields");
+        }
+
+        else {
+            Ask ask = null;
+            ask = new Ask(pic, dro, dor, sr, piclatlng, drolatlng);
+
+            FirebaseDatabase.getInstance().getReference().child("requests").push()
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .setValue(ask).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        showMessage("Request has made successfully");
+
+                    } else {
+                        showMessage("Can't request for ride");
+                    }
+                }
+            });
+            startActivity(new Intent(this, Mapforrequestor.class));
+        }
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -155,6 +197,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 pickup = place.getName().toString();
                 editText.setText(pickup);
+                piclatlng = place.getLatLng().toString();
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -168,6 +211,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 dropoff = place.getName().toString();
                 editText1.setText(dropoff);
+                drolatlng = place.getLatLng().toString();
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);

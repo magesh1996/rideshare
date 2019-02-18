@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 String password = editText1.getText().toString();
 
                 if(email.isEmpty() || password.isEmpty()){
-                    Toast.makeText(MainActivity.this,"Invalid Credentials!",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,"Please verify all fields",Toast.LENGTH_SHORT).show();
                 }
                 else {
 
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (!task.isSuccessful()) {
-                                Toast.makeText(MainActivity.this, "Not Successful", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Invalid Credentials!", Toast.LENGTH_SHORT).show();
                             } else {
                                 startActivity(new Intent(MainActivity.this, UserActivity.class));
                                 finish();

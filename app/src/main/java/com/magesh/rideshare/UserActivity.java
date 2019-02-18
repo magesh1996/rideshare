@@ -21,13 +21,16 @@ public class UserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
-        drawerLayout = (DrawerLayout) findViewById(R.id.activity_user);
+        drawerLayout = findViewById(R.id.activity_user);
         toggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.open,R.string.close);
         drawerLayout.addDrawerListener(toggle);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nv);
+        NavigationView navigationView = findViewById(R.id.nv);
         toggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setupDrawerContent(navigationView);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flcontent,new dashboard()).commit();
+        setTitle("dashboard");
     }
 
     public void selectItemDrawer(MenuItem menuItem){
@@ -45,6 +48,7 @@ public class UserActivity extends AppCompatActivity {
                 break;
             default:
                 fragmentClass = dashboard.class;
+                break;
         }
         try{
             myfragment = (Fragment) fragmentClass.newInstance();
