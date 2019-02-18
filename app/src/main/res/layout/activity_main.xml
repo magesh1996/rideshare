@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:labelFor="@+id/button1"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -16,9 +15,13 @@
         android:layout_marginTop="15dp"
         android:layout_marginRight="15dp"
         android:text="Log In"
+        android:gravity="center_horizontal"
         android:textSize="24sp"
         android:textStyle="bold" />
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:id="@+id/editText"
         android:layout_width="match_parent"
@@ -29,7 +32,11 @@
         android:ems="10"
         android:hint="email"
         android:inputType="textEmailAddress" />
+    </android.support.design.widget.TextInputLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <EditText
         android:id="@+id/editText1"
         android:layout_width="match_parent"
@@ -40,6 +47,7 @@
         android:ems="10"
         android:hint="password"
         android:inputType="textPassword" />
+    </android.support.design.widget.TextInputLayout>
 
     <Button
         android:id="@+id/button"
@@ -48,7 +56,8 @@
         android:layout_marginLeft="130dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="130dp"
-        android:text="log in" />
+        android:text="log in"
+        android:background="@drawable/roundedcornerbutton"/>
 
     <TextView
         android:id="@+id/textView1"

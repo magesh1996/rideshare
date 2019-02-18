@@ -163,4 +163,15 @@ public class Mapforrequestor extends AppCompatActivity implements OnMapReadyCall
         GeoFire geoFire = new GeoFire(dbRef);
         geoFire.setLocation(cloc, new GeoLocation(location.getLatitude(),location.getLongitude()));
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(userid);
+        String cloc = "cloc";
+        GeoFire geoFire = new GeoFire(dbRef);
+        geoFire.removeLocation(cloc);
+    }
 }

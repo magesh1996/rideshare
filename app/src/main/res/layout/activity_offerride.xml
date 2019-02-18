@@ -21,7 +21,9 @@
             android:layout_height="wrap_content"
             android:text="Offer a ride,"
             android:textStyle="bold|italic"
+            android:gravity="center_horizontal"
             android:textSize="25sp"/>
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -31,9 +33,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="true"
                 android:hint="Origin"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:focusable="true"/>
         </android.support.design.widget.TextInputLayout>
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
