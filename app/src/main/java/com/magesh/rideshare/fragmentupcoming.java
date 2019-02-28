@@ -75,7 +75,7 @@ public class fragmentupcoming extends Fragment {
             }
         });
 
-        listupcoming.add(new upcoming("dummy","dummy","20-12-2019","6"));
+        //listupcoming.add(new upcoming("dummy","dummy","20-12-2019","6"));
 
     }
 
