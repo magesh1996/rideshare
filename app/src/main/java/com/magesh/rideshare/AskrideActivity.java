@@ -16,6 +16,7 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -43,8 +44,9 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
     EditText editText, editText1, editText2, editText3;
     Button button;
 
-    String pickup, piclatlng;
-    String dropoff, drolatlng;
+    String pickup, dropoff;
+    LatLng piclatlng, drolatlng;
+    double piclat, piclng, drolat, drolng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,8 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
         editText2.setOnClickListener(this);
         editText3.setOnClickListener(this);
         button.setOnClickListener(this);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Places.initialize(getApplicationContext(), "AIzaSyBNOGGHYlXOJ44JTyGYAMXCKXTnheWtouk");
 
@@ -167,7 +171,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
 
         else {
             Ask ask = null;
-            ask = new Ask(pic, dro, dor, sr, piclatlng, drolatlng);
+            ask = new Ask(pic, dro, dor, sr, piclat, piclng, drolat, drolng);
 
             FirebaseDatabase.getInstance().getReference().child("requests").push()
                     .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -197,7 +201,9 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 pickup = place.getName().toString();
                 editText.setText(pickup);
-                piclatlng = place.getLatLng().toString();
+                piclatlng = place.getLatLng();
+                piclat = piclatlng.latitude;
+                piclng = piclatlng.longitude;
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -211,7 +217,9 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 dropoff = place.getName().toString();
                 editText1.setText(dropoff);
-                drolatlng = place.getLatLng().toString();
+                drolatlng = place.getLatLng();
+                drolat = drolatlng.latitude;
+                drolng = drolatlng.longitude;
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);

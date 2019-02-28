@@ -12,6 +12,9 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Switch;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class UserActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
@@ -39,6 +42,9 @@ public class UserActivity extends AppCompatActivity {
         switch (menuItem.getItemId()){
             case R.id.dashboard:
                 fragmentClass = dashboard.class;
+                break;
+            case R.id.myrides:
+                fragmentClass = myrides.class;
                 break;
             case R.id.settings:
                 fragmentClass = settings.class;
@@ -80,4 +86,5 @@ public class UserActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

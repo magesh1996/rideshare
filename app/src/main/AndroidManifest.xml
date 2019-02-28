@@ -48,9 +48,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.magesh.rideshare.UserActivity" />
         </activity>
-        <activity android:name=".OfferrideActivity" />
+        <activity android:name=".OfferrideActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.magesh.rideshare.UserActivity" />
+        </activity>
         <activity android:name=".header" />
-        <activity android:name=".AskrideActivity" />
+        <activity android:name=".AskrideActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.magesh.rideshare.UserActivity" />
+        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

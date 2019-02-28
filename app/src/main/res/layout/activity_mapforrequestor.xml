@@ -10,4 +10,6 @@
     map:uiCompass="false"
     map:uiRotateGestures="false"
     map:uiTiltGestures="true"
-    map:mapType="normal" />
+    map:mapType="normal">
+</fragment>
+

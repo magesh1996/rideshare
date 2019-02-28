@@ -85,6 +85,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
+
                                     showMessage("Successfully registered");
                                 } else {
                                     showMessage("Registration failed");

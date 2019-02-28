@@ -40,13 +40,20 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
 
     private static final int LOCATION_REQUEST_CODE = 101;
 
+    String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(userid);
+
+    GeoFire geoFire = new GeoFire(dbRef);
+
+    String cloc = "cloc";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mapfordriver);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
 
         if (ActivityCompat.checkSelfPermission(Mapfordriver.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -135,6 +142,7 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         googleMap.setMyLocationEnabled(true);
+        googleMap.setPadding(0,70,0,0);
 
     }
 
@@ -156,11 +164,6 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
     public void onLocationChanged(Location location) {
         latLng = new LatLng(location.getLatitude(),location.getLongitude());
 
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String cloc = "cloc";
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(userid);
-
-        GeoFire geoFire = new GeoFire(dbRef);
         geoFire.setLocation(cloc, new GeoLocation(location.getLatitude(),location.getLongitude()));
     }
 
@@ -168,10 +171,7 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStop() {
         super.onStop();
 
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference().child("users").child(userid);
-        String cloc = "cloc";
-        GeoFire geoFire = new GeoFire(dbRef);
         geoFire.removeLocation(cloc);
     }
+
 }

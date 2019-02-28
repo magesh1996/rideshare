@@ -18,6 +18,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -46,8 +47,9 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
     EditText editText, editText1, editText2, editText3, editText4, editText5;
     Button button;
 
-    String origin, orilatlng;
-    String destination, deslatlng;
+    String origin, destination;
+    LatLng orilatlng, deslatlng;
+    double orilat, orilng, deslat ,deslng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,8 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
         editText3.setOnClickListener(this);
         editText4.setOnClickListener(this);
         button.setOnClickListener(this);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Places.initialize(getApplicationContext(), "AIzaSyBNOGGHYlXOJ44JTyGYAMXCKXTnheWtouk");
 
@@ -192,11 +196,11 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
         }
 
         else {
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
             Offer offer = null;
-            offer = new Offer(ori, des, dor, dep, sa, car, orilatlng, deslatlng);
+            offer = new Offer(uid, ori, des, dor, dep, sa, car, orilat, orilng, deslat, deslng);
 
             FirebaseDatabase.getInstance().getReference().child("offers").push()
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .setValue(offer).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -223,7 +227,9 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 origin = place.getName().toString();
                 editText.setText(origin);
-                orilatlng = place.getLatLng().toString();
+                orilatlng = place.getLatLng();
+                orilat = orilatlng.latitude;
+                orilng = orilatlng.longitude;
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
                 Status status = Autocomplete.getStatusFromIntent(data);
@@ -237,7 +243,9 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
                 Place place = Autocomplete.getPlaceFromIntent(data);
                 destination = place.getName().toString();
                 editText1.setText(destination);
-                deslatlng = place.getLatLng().toString();
+                deslatlng = place.getLatLng();
+                deslat = deslatlng.latitude;
+                deslng = deslatlng.longitude;
 
             } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
                 // TODO: Handle the error.
