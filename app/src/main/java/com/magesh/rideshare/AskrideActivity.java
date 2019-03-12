@@ -186,7 +186,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 }
             });
-            startActivity(new Intent(this, Mapforrequestor.class));
+            startActivity(new Intent(this, OffersavailableActivity.class));
         }
     }
 
