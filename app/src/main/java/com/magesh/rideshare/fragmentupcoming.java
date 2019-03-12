@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,19 +19,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class fragmentupcoming extends Fragment {
 
     View v;
 
-    final String cu = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
     private RecyclerView recyclerView;
 
-    private List<upcoming> listupcoming;
+    List<upcoming> listupcoming;
 
-    DatabaseReference databaseReference;
+    DatabaseReference databaseReference1, databaseReference2;
 
     public fragmentupcoming(){
 
@@ -53,9 +53,13 @@ public class fragmentupcoming extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        final String cu = user.getUid();
+
         listupcoming = new ArrayList<>();
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("offers");
-        databaseReference.orderByChild("uid").equalTo(cu).addValueEventListener(new ValueEventListener() {
+        databaseReference1 = FirebaseDatabase.getInstance().getReference().child("offers");
+        databaseReference1.orderByChild("uid").equalTo(cu).addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -65,7 +69,31 @@ public class fragmentupcoming extends Fragment {
                     String des = data.child("des").getValue(String.class);
                     String dor = data.child("dor").getValue(String.class);
                     String sa = data.child("sa").getValue(String.class);
-                    listupcoming.add(new upcoming(ori, des, dor, sa));
+                    String offorreq = "offered";
+                    listupcoming.add(new upcoming(ori, des, dor, sa, offorreq));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        databaseReference2 = FirebaseDatabase.getInstance().getReference().child("requests");
+        databaseReference2.orderByChild("uid").equalTo(cu).addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    /*listupcoming.add(new upcoming(data.child("pic").getValue(String.class),data.child("dro").getValue(String.class),
+                            data.child("dor").getValue(String.class),data.child("sr").getValue(String.class),"requested"));*/
+                    String pic = data.child("pic").getValue(String.class);
+                    String dro = data.child("dro").getValue(String.class);
+                    String dor = data.child("dor").getValue(String.class);
+                    String sr = data.child("sr").getValue(String.class);
+                    String offorreq = "requested";
+                    listupcoming.add(new upcoming(pic, dro, dor, sr, offorreq));
                 }
             }
 
@@ -75,7 +103,12 @@ public class fragmentupcoming extends Fragment {
             }
         });
 
-        //listupcoming.add(new upcoming("dummy","dummy","20-12-2019","6"));
+        listupcoming.add(new upcoming("dummy","dummy","22-12-2019","6","requested"));
+        listupcoming.add(new upcoming("dummy","dummy","20-12-2019","6","offered"));
+        listupcoming.add(new upcoming("dummy","dummy","21-12-2019","6","requested"));
+        listupcoming.add(new upcoming("dummy","dummy","23-12-2019","6","offered"));
+
+        listupcoming.sort(Comparator.comparing(upcoming::getDor));
 
     }
 

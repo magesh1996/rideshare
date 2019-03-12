@@ -1,14 +1,15 @@
 package com.magesh.rideshare;
 
 public class Ask {
-    public String pic, dro, dor, sr;
+    public String uid, pic, dro, dor, sr;
     public double piclat, piclng, drolat, drolng;
 
     public Ask(){
 
     }
 
-    public Ask(String pic, String dro, String dor, String sr, double piclat, double piclng, double drolat, double drolng){
+    public Ask(String uid, String pic, String dro, String dor, String sr, double piclat, double piclng, double drolat, double drolng){
+        this.uid = uid;
         this.pic = pic;
         this.dro = dro;
         this.dor = dor;

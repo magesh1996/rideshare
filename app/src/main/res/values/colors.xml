@@ -6,6 +6,7 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
     <color name="darkgrey">#808080</color>
+    <color name="mediumgrey">#aaaaaa</color>
     <color name="grey">#fcfcfc</color>
     <color name="yellow">#fff400</color>
     <color name="skyblue">#87CEEB</color>

@@ -37,7 +37,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         myViewHolder.tvend.setText(upcomingList.get(i).getDes());
         myViewHolder.tvdor.setText(upcomingList.get(i).getDor());
         myViewHolder.tvnos.setText(upcomingList.get(i).getSa());
-        myViewHolder.tvofforreq.setText("offered");
+        myViewHolder.tvofforreq.setText(upcomingList.get(i).getOfforreq());
 
 
     }

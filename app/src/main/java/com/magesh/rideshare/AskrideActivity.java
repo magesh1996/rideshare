@@ -170,11 +170,11 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         else {
+            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
             Ask ask = null;
-            ask = new Ask(pic, dro, dor, sr, piclat, piclng, drolat, drolng);
+            ask = new Ask(uid, pic, dro, dor, sr, piclat, piclng, drolat, drolng);
 
             FirebaseDatabase.getInstance().getReference().child("requests").push()
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .setValue(ask).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
