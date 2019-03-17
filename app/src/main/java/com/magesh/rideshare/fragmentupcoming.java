@@ -26,6 +26,8 @@ public class fragmentupcoming extends Fragment {
 
     View v;
 
+    RecyclerViewAdapter recyclerViewAdapter;
+
     private RecyclerView recyclerView;
 
     List<upcoming> listupcoming;
@@ -40,18 +42,6 @@ public class fragmentupcoming extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        v = inflater.inflate(R.layout.upcoming,container,false);
-        recyclerView = v.findViewById(R.id.upcomingrcview);
-        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(),listupcoming);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setAdapter(recyclerViewAdapter);
-        return v;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -72,6 +62,7 @@ public class fragmentupcoming extends Fragment {
                     String offorreq = "offered";
                     listupcoming.add(new upcoming(ori, des, dor, sa, offorreq));
                 }
+                recyclerViewAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -95,6 +86,7 @@ public class fragmentupcoming extends Fragment {
                     String offorreq = "requested";
                     listupcoming.add(new upcoming(pic, dro, dor, sr, offorreq));
                 }
+                recyclerViewAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -103,12 +95,24 @@ public class fragmentupcoming extends Fragment {
             }
         });
 
-        listupcoming.add(new upcoming("dummy","dummy","22-12-2019","6","requested"));
+        /*listupcoming.add(new upcoming("dummy","dummy","22-12-2019","6","requested"));
         listupcoming.add(new upcoming("dummy","dummy","20-12-2019","6","offered"));
         listupcoming.add(new upcoming("dummy","dummy","21-12-2019","6","requested"));
-        listupcoming.add(new upcoming("dummy","dummy","23-12-2019","6","offered"));
+        listupcoming.add(new upcoming("dummy","dummy","23-12-2019","6","offered"));*/
 
         listupcoming.sort(Comparator.comparing(upcoming::getDor));
+
+        v = inflater.inflate(R.layout.upcoming,container,false);
+        recyclerView = v.findViewById(R.id.upcomingrcview);
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(),listupcoming);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(recyclerViewAdapter);
+        return v;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
     }
 

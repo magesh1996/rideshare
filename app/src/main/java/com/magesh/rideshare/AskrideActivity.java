@@ -15,6 +15,8 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,6 +27,7 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
@@ -174,11 +177,21 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
             Ask ask = null;
             ask = new Ask(uid, pic, dro, dor, sr, piclat, piclng, drolat, drolng);
 
-            FirebaseDatabase.getInstance().getReference().child("requests").push()
+            DatabaseReference databaseReference;
+            databaseReference = FirebaseDatabase.getInstance().getReference().child("requests");
+
+            String pkey = databaseReference.push().getKey();
+
+            FirebaseDatabase.getInstance().getReference().child("requests").child(pkey)
                     .setValue(ask).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
+                        DatabaseReference databaseReference1;
+                        databaseReference1 = FirebaseDatabase.getInstance().getReference().child("requests").child(pkey);
+                        GeoFire geoFire = new GeoFire(databaseReference1);
+                        geoFire.setLocation("ploc",new GeoLocation(piclat,piclng));
+                        geoFire.setLocation("dloc", new GeoLocation(drolat,drolng));
                         showMessage("Request has made successfully");
 
                     } else {
@@ -186,7 +199,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 }
             });
-            startActivity(new Intent(this, OffersavailableActivity.class));
+            startActivity(new Intent(this, OffersavailableActivity.class).putExtra("pic",pic).putExtra("dro",dro).putExtra("dor",dor).putExtra("sr",sr));
         }
     }
 

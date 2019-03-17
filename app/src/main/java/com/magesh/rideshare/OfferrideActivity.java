@@ -17,6 +17,8 @@ import android.widget.NumberPicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,6 +31,7 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
@@ -200,11 +203,21 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
             Offer offer = null;
             offer = new Offer(uid, ori, des, dor, dep, sa, car, orilat, orilng, deslat, deslng);
 
-            FirebaseDatabase.getInstance().getReference().child("offers").push()
+            DatabaseReference databaseReference;
+            databaseReference = FirebaseDatabase.getInstance().getReference().child("offers");
+
+            String pkey = databaseReference.push().getKey();
+
+            FirebaseDatabase.getInstance().getReference().child("offers").child(pkey)
                     .setValue(offer).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
+                        DatabaseReference databaseReference1;
+                        databaseReference1 = FirebaseDatabase.getInstance().getReference().child("offers").child(pkey);
+                        GeoFire geoFire = new GeoFire(databaseReference1);
+                        geoFire.setLocation("oloc",new GeoLocation(orilat,orilng));
+                        geoFire.setLocation("dloc", new GeoLocation(deslat,deslng));
                         showMessage("You offered your ride");
 
                     } else {
