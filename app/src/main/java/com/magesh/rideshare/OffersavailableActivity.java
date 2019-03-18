@@ -1,6 +1,7 @@
 package com.magesh.rideshare;
 
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +24,8 @@ import java.util.List;
 public class OffersavailableActivity extends AppCompatActivity implements Offersavailablervadapter.ItemClickListener {
 
     Offersavailablervadapter offersavailablervadapter;
-    DatabaseReference databaseReference;
+    DatabaseReference databaseReference, dbref;
+    String uname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

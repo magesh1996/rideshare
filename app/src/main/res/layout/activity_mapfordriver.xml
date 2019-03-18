@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.MapFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Mapfordriver"
-    map:uiCompass="false"
-    map:uiRotateGestures="false"
-    map:uiTiltGestures="true"
-    map:mapType="normal" />
+    android:layout_height="match_parent">
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".Mapfordriver"
+        map:uiCompass="false"
+        map:uiRotateGestures="false"
+        map:uiTiltGestures="true"
+        map:mapType="normal" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/people"
+        map:backgroundTint="@color/colorPrimary"
+        map:maxImageSize="45dp" />
+
+</android.support.design.widget.CoordinatorLayout>

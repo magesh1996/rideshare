@@ -1,6 +1,7 @@
 package com.magesh.rideshare;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
@@ -9,6 +10,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.directions.route.AbstractRouting;
+import com.directions.route.Route;
+import com.directions.route.RouteException;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -17,20 +23,34 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+import java.util.ArrayList;
+import java.util.List;
 
-    private LatLng latLng;
+public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallback, LocationListener, RoutingListener {
+
+    private LatLng latLng, start, end;
+
+    List<Polyline> polylines;
+
+    GoogleMap mMap;
+
+    private static final int[] COLORS = new int[]{R.color.route};
 
     private Location currentlocation;
 
@@ -55,6 +75,17 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        Bundle b = getIntent().getExtras();
+
+        double orilat = b.getDouble("orilat");
+        double orilng = b.getDouble("orilng");
+        double deslat = b.getDouble("deslat");
+        double deslng = b.getDouble("deslng");
+
+        start = new LatLng(orilat,orilng);
+        end = new LatLng(deslat, deslng);
+
+        polylines = new ArrayList<>();
 
         if (ActivityCompat.checkSelfPermission(Mapfordriver.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(Mapfordriver.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -65,6 +96,17 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
 
         fetchLastLocation();
 
+    }
+
+    private void route() {
+        Routing routing = new Routing.Builder()
+                .travelMode(AbstractRouting.TravelMode.DRIVING)
+                .withListener(this)
+                .alternativeRoutes(false)
+                .waypoints(start, end)
+                .key("AIzaSyBNOGGHYlXOJ44JTyGYAMXCKXTnheWtouk")
+                .build();
+        routing.execute();
     }
 
     private void fetchLastLocation() {
@@ -127,9 +169,11 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+        mMap = googleMap;
+
         latLng = new LatLng(currentlocation.getLatitude(), currentlocation.getLongitude());
 
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(start, 15));
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -141,8 +185,10 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        googleMap.setMyLocationEnabled(true);
-        googleMap.setPadding(0,70,0,0);
+        mMap.setMyLocationEnabled(true);
+        mMap.setPadding(0,70,0,0);
+
+        route();
 
     }
 
@@ -174,4 +220,62 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
         geoFire.removeLocation(cloc);
     }
 
+    @Override
+    public void onRoutingFailure(RouteException e) {
+        // The Routing request failed
+        if(e != null) {
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(this, "Something went wrong, Try again", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRoutingStart() {
+
+    }
+
+    @Override
+    public void onRoutingSuccess(ArrayList<Route> route, int shortestRouteIndex) {
+
+        if(polylines.size()>0) {
+            for (Polyline poly : polylines) {
+                poly.remove();
+            }
+        }
+
+        polylines = new ArrayList<>();
+        //add route(s) to the map.
+        for (int i = 0; i <route.size(); i++) {
+
+            //In case of more than 5 alternative routes
+            int colorIndex = i % COLORS.length;
+
+            PolylineOptions polyOptions = new PolylineOptions();
+            polyOptions.color(getResources().getColor(COLORS[colorIndex]));
+            polyOptions.width(10 + i * 3);
+            polyOptions.addAll(route.get(i).getPoints());
+            Polyline polyline = mMap.addPolyline(polyOptions);
+            polylines.add(polyline);
+
+            Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
+        }
+
+        MarkerOptions options = new MarkerOptions();
+        options.position(start);
+        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.start));
+        mMap.addMarker(options);
+
+        // End marker
+        options = new MarkerOptions();
+        options.position(end);
+        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.end));
+        mMap.addMarker(options);
+
+    }
+
+    @Override
+    public void onRoutingCancelled() {
+
+    }
 }

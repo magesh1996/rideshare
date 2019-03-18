@@ -225,7 +225,12 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
                     }
                 }
             });
-            startActivity(new Intent(this, Mapfordriver.class));
+            Bundle b = new Bundle();
+            b.putDouble("orilat",orilat);
+            b.putDouble("orilng",orilng);
+            b.putDouble("deslat",deslat);
+            b.putDouble("deslng",deslng);
+            startActivity(new Intent(this, Mapfordriver.class).putExtras(b));
         }
     }
 
