@@ -173,7 +173,7 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         else {
-            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            /*String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
             Ask ask = null;
             ask = new Ask(uid, pic, dro, dor, sr, piclat, piclng, drolat, drolng);
 
@@ -192,14 +192,24 @@ public class AskrideActivity extends AppCompatActivity implements View.OnClickLi
                         GeoFire geoFire = new GeoFire(databaseReference1);
                         geoFire.setLocation("ploc",new GeoLocation(piclat,piclng));
                         geoFire.setLocation("dloc", new GeoLocation(drolat,drolng));
-                        showMessage("Request has made successfully");
+                        showMessage("search completed");
 
                     } else {
                         showMessage("Can't request for ride");
                     }
                 }
-            });
-            startActivity(new Intent(this, OffersavailableActivity.class).putExtra("pic",pic).putExtra("dro",dro).putExtra("dor",dor).putExtra("sr",sr));
+            });*/
+            Bundle b = new Bundle();
+            b.putString("pic",pic);
+            b.putString("dro",dro);
+            b.putString("dor",dor);
+            b.putString("sr",sr);
+            b.putDouble("piclat",piclat);
+            b.putDouble("piclng",piclng);
+            b.putDouble("drolat",drolat);
+            b.putDouble("drolng",drolng);
+            startActivity(new Intent(this, OffersavailableActivity.class)
+                    .putExtras(b));
         }
     }
 

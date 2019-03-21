@@ -1,6 +1,7 @@
 package com.magesh.rideshare;
 
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -16,25 +17,44 @@ import com.squareup.picasso.Picasso;
 
 public class header extends AppCompatActivity {
 
-    ImageView headerpropic;
-    TextView headerproname;
-
-    FirebaseAuth firebaseAuth;
-    DatabaseReference dbref;
+    ImageView headerpic;
+    TextView headername;
+    NavigationView navigationView;
+    //FirebaseAuth firebaseAuth;
+    //DatabaseReference dbref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.header);
 
-        headerpropic = findViewById(R.id.headerpropic);
-        headerproname = findViewById(R.id.headerproname);
+        headerpic = findViewById(R.id.headerpropic);
+        headername = navigationView.getHeaderView(0).findViewById(R.id.headerproname);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        getCurrentInfo();
 
-        dbref = FirebaseDatabase.getInstance().getReference().child("users").child(firebaseAuth.getCurrentUser().getUid());
 
-        dbref.addValueEventListener(new ValueEventListener() {
+
+        /*dbref = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
+        dbref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String uname = dataSnapshot.child("name").getValue(String.class);
+                headername.setText(uname);
+                headername.notify();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });*/
+
+        //firebaseAuth = FirebaseAuth.getInstance();
+
+        //dbref = FirebaseDatabase.getInstance().getReference().child("users").child(firebaseAuth.getCurrentUser().getUid());
+
+        /*dbref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 headerproname.setText(dataSnapshot.child("name").getValue().toString());
@@ -46,8 +66,14 @@ public class header extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
 
+    }
+
+    private void getCurrentInfo() {
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        headername.setText(uid);
     }
 }

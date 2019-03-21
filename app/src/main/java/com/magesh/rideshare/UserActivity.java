@@ -11,15 +11,26 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.DatePicker;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class UserActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
+
+    TextView headername;
+
+    DatabaseReference dbref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +46,26 @@ public class UserActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.flcontent,new dashboard()).commit();
         setTitle("dashboard");
+
+        headername = navigationView.getHeaderView(0).findViewById(R.id.headerproname);
+        getCurrentInfo();
+    }
+
+    private void getCurrentInfo() {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        dbref = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
+        dbref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String uname = dataSnapshot.child("name").getValue(String.class);
+                headername.setText(uname);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void selectItemDrawer(MenuItem menuItem){

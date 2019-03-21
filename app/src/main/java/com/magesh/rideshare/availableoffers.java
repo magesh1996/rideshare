@@ -2,9 +2,10 @@ package com.magesh.rideshare;
 
 public class availableoffers {
 
-    String rname, start, end, cob, sa;
+    String oid, rname, start, end, cob, sa;
 
-    public availableoffers(String rname, String start, String end, String cob, String sa) {
+    public availableoffers(String oid, String rname, String start, String end, String cob, String sa) {
+        this.oid = oid;
         this.rname = rname;
         this.start = start;
         this.end = end;
@@ -14,6 +15,7 @@ public class availableoffers {
 
     //getter
 
+    public String getOid() { return oid; }
 
     public String getRname() {
         return rname;
@@ -37,6 +39,7 @@ public class availableoffers {
 
     //setter
 
+    public void setOid(String oid) { this.oid = oid; }
 
     public void setRname(String rname) {
         this.rname = rname;

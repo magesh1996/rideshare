@@ -61,6 +61,7 @@ public class fragmentupcoming extends Fragment {
                     String sa = data.child("sa").getValue(String.class);
                     String offorreq = "offered";
                     listupcoming.add(new upcoming(ori, des, dor, sa, offorreq));
+                    listupcoming.sort(Comparator.comparing(upcoming::getDor));
                 }
                 recyclerViewAdapter.notifyDataSetChanged();
             }
@@ -85,6 +86,7 @@ public class fragmentupcoming extends Fragment {
                     String sr = data.child("sr").getValue(String.class);
                     String offorreq = "requested";
                     listupcoming.add(new upcoming(pic, dro, dor, sr, offorreq));
+                    listupcoming.sort(Comparator.comparing(upcoming::getDor));
                 }
                 recyclerViewAdapter.notifyDataSetChanged();
             }
@@ -100,7 +102,7 @@ public class fragmentupcoming extends Fragment {
         listupcoming.add(new upcoming("dummy","dummy","21-12-2019","6","requested"));
         listupcoming.add(new upcoming("dummy","dummy","23-12-2019","6","offered"));*/
 
-        listupcoming.sort(Comparator.comparing(upcoming::getDor));
+        //listupcoming.sort(Comparator.comparing(upcoming::getDor));
 
         v = inflater.inflate(R.layout.upcoming,container,false);
         recyclerView = v.findViewById(R.id.upcomingrcview);

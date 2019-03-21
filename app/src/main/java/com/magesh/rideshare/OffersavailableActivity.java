@@ -3,13 +3,20 @@ package com.magesh.rideshare;
 import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -19,13 +26,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class OffersavailableActivity extends AppCompatActivity implements Offersavailablervadapter.ItemClickListener {
+public class OffersavailableActivity extends AppCompatActivity {
 
     Offersavailablervadapter offersavailablervadapter;
-    DatabaseReference databaseReference, dbref;
-    String uname;
+    DatabaseReference databaseReference, dbref, dbref1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +41,17 @@ public class OffersavailableActivity extends AppCompatActivity implements Offers
         setContentView(R.layout.activity_offersavailable);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Intent i = getIntent();
+        Bundle b = getIntent().getExtras();
 
-        String pic = i.getStringExtra("pic");
-        String dro = i.getStringExtra("dro");
-        String dor = i.getStringExtra("dor");
-        String sr = i.getStringExtra("sr");
+        String pic = b.getString("pic");
+        String dro = b.getString("dro");
+        String dor = b.getString("dor");
+        String sr = b.getString("sr");
+        int srint = Integer.parseInt(sr);
+        Double piclat = b.getDouble("piclat");
+        Double piclng = b.getDouble("piclng");
+        Double drolat = b.getDouble("drolat");
+        Double drolng = b.getDouble("drolng");
 
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -58,10 +71,12 @@ public class OffersavailableActivity extends AppCompatActivity implements Offers
                     String offerdor = data.child("dor").getValue(String.class);
                     String cob = data.child("cob").getValue(String.class);
                     String sa = data.child("sa").getValue(String.class);
+                    int saint = Integer.parseInt(sa);
                     String ruid = data.child("uid").getValue(String.class);
+                    String oid = data.getKey().toString();
 
-                    if (ori.equals(pic) && des.equals(dro) && offerdor.equals(dor) && sr.equals(sr)) {
-                        list.add(new availableoffers(ruid, ori, des, cob, sa));
+                    if (ori.equals(pic) && des.equals(dro) && offerdor.equals(dor) && saint >= srint) {
+                        list.add(new availableoffers(oid, ruid, ori, des, cob, sa));
                     }
                     offersavailablervadapter.notifyDataSetChanged();
                 }
@@ -76,14 +91,57 @@ public class OffersavailableActivity extends AppCompatActivity implements Offers
 
         RecyclerView recyclerView = findViewById(R.id.listofoffersrv);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        offersavailablervadapter = new Offersavailablervadapter(this,list);
-        offersavailablervadapter.setClickListener(this);
+        offersavailablervadapter = new Offersavailablervadapter(this, list, new Offersavailablervadapter.ItemClickListener() {
+            @Override
+            public void onreq(View view, int i) {
+                String offerid = list.get(i).getOid();
+                String proid = list.get(i).getRname();
+                String requestorid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                Ask ask = null;
+                ask = new Ask(uid, pic, dro, dor, sr, piclat, piclng, drolat, drolng);
+
+                DatabaseReference databaseReference;
+                databaseReference = FirebaseDatabase.getInstance().getReference().child("requests");
+
+                String pkey = databaseReference.push().getKey();
+
+                FirebaseDatabase.getInstance().getReference().child("requests").child(pkey)
+                        .setValue(ask).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            DatabaseReference databaseReference1;
+                            databaseReference1 = FirebaseDatabase.getInstance().getReference().child("requests").child(pkey);
+                            GeoFire geoFire = new GeoFire(databaseReference1);
+                            geoFire.setLocation("ploc",new GeoLocation(piclat,piclng));
+                            geoFire.setLocation("dloc", new GeoLocation(drolat,drolng));
+                            //Toast.makeText(getApplicationContext(),"search completed",Toast.LENGTH_SHORT).show();
+
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(),"can't request for ride",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
+                /*dbref = FirebaseDatabase.getInstance().getReference().child("offers").child(offerid).child("waitingreq");
+                Map<String, Object> requpdates = new HashMap<>();
+                requpdates.put("requestor", requestorid);
+                dbref.updateChildren(requpdates, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                        Toast.makeText(getApplicationContext(),"requested "+proid,Toast.LENGTH_SHORT).show();
+                    }
+                });*/
+            }
+        });
+        //offersavailablervadapter.setClickListener(this);
         recyclerView.setAdapter(offersavailablervadapter);
 
     }
 
-    @Override
-    public void onItemClick(View view, int i) {
-
-    }
 }
