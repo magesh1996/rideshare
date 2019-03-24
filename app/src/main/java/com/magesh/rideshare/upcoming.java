@@ -2,18 +2,19 @@ package com.magesh.rideshare;
 
 public class upcoming {
 
-    String ori, des, dor, sa, offorreq;
+    String ori, des, dor, sa, offorreq, offorreqid;
 
     public upcoming() {
     }
 
-    public upcoming(String ori, String des, String dor, String sa, String offorreq){
+    public upcoming(String ori, String des, String dor, String sa, String offorreq, String offorreqid){
 
         this.ori = ori;
         this.des = des;
         this.dor = dor;
         this.sa = sa;
         this.offorreq = offorreq;
+        this.offorreqid = offorreqid;
 
     }
 
@@ -39,6 +40,10 @@ public class upcoming {
         return offorreq;
     }
 
+    public String getOfforreqid() {
+        return offorreqid;
+    }
+
     //setter
 
     public void setOri(String ori) {
@@ -61,4 +66,7 @@ public class upcoming {
         this.offorreq = offorreq;
     }
 
+    public void setOfforreqid(String offorreqid) {
+        this.offorreqid = offorreqid;
+    }
 }

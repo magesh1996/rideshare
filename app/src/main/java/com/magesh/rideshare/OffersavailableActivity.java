@@ -58,11 +58,12 @@ public class OffersavailableActivity extends AppCompatActivity {
         String usr = user.getUid();
 
         List<availableoffers> list = new ArrayList<>();
+        List<availableoffers> getlist = new ArrayList<>();
 
         //list.add(new availableoffers("jon snow", "dummy", "dummy", "jetta", "2" ));
 
         databaseReference = FirebaseDatabase.getInstance().getReference().child("offers");
-        databaseReference.orderByChild("des").equalTo(dro).addValueEventListener(new ValueEventListener() {
+        databaseReference.orderByChild("des").equalTo(dro).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren()){
@@ -76,9 +77,12 @@ public class OffersavailableActivity extends AppCompatActivity {
                     String oid = data.getKey().toString();
 
                     if (ori.equals(pic) && des.equals(dro) && offerdor.equals(dor) && saint >= srint) {
-                        list.add(new availableoffers(oid, ruid, ori, des, cob, sa));
+                        getlist.add(new availableoffers(oid, ruid, ori, des, cob, sa));
                     }
+                    list.clear();
+                    list.addAll(getlist);
                     offersavailablervadapter.notifyDataSetChanged();
+                    Toast.makeText(getApplicationContext(),"search completed",Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -99,44 +103,98 @@ public class OffersavailableActivity extends AppCompatActivity {
                 String requestorid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                Ask ask = null;
-                ask = new Ask(uid, pic, dro, dor, sr, piclat, piclng, drolat, drolng);
-
-                DatabaseReference databaseReference;
-                databaseReference = FirebaseDatabase.getInstance().getReference().child("requests");
-
-                String pkey = databaseReference.push().getKey();
-
-                FirebaseDatabase.getInstance().getReference().child("requests").child(pkey)
-                        .setValue(ask).addOnCompleteListener(new OnCompleteListener<Void>() {
+                dbref1 = FirebaseDatabase.getInstance().getReference().child("offers").child(offerid).child("reqs").child(usr);
+                //dbref = dbref1.child(pkey);
+                Map<String, Object> requpdates = new HashMap<>();
+                dbref1.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            DatabaseReference databaseReference1;
-                            databaseReference1 = FirebaseDatabase.getInstance().getReference().child("requests").child(pkey);
-                            GeoFire geoFire = new GeoFire(databaseReference1);
-                            geoFire.setLocation("ploc",new GeoLocation(piclat,piclng));
-                            geoFire.setLocation("dloc", new GeoLocation(drolat,drolng));
-                            //Toast.makeText(getApplicationContext(),"search completed",Toast.LENGTH_SHORT).show();
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
 
+
+
+                            String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            Ask ask = null;
+                            ask = new Ask(uid, pic, dro, dor, sr, piclat, piclng, drolat, drolng);
+
+                            DatabaseReference databaseReference;
+                            databaseReference = FirebaseDatabase.getInstance().getReference().child("requests");
+
+                            String pkey = databaseReference.push().getKey();
+
+                            FirebaseDatabase.getInstance().getReference().child("requests").child(pkey)
+                                    .setValue(ask).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        DatabaseReference databaseReference1;
+                                        databaseReference1 = FirebaseDatabase.getInstance().getReference().child("requests").child(pkey);
+                                        GeoFire geoFire = new GeoFire(databaseReference1);
+                                        geoFire.setLocation("ploc",new GeoLocation(piclat,piclng));
+                                        geoFire.setLocation("dloc", new GeoLocation(drolat,drolng));
+                                        Toast.makeText(getApplicationContext(),"requesting",Toast.LENGTH_SHORT).show();
+
+                                    }
+                                    else {
+                                        Toast.makeText(getApplicationContext(),"can't request for ride",Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+
+
+
+                            requpdates.put("aord", "waiting");
+                            requpdates.put("requestid", pkey);
+                            requpdates.put("requestorid", usr);
+                            requpdates.put("pickup", pic);
+                            requpdates.put("dropoff", dro);
+                            requpdates.put("sr", sr);
+                            dbref1.updateChildren(requpdates, new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                    Toast.makeText(getApplicationContext(),"requested "+proid,Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                         else {
-                            Toast.makeText(getApplicationContext(),"can't request for ride",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"already requested",Toast.LENGTH_SHORT).show();
                         }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
 
-
-                /*dbref = FirebaseDatabase.getInstance().getReference().child("offers").child(offerid).child("waitingreq");
+                /*dbref1 = FirebaseDatabase.getInstance().getReference().child("waitingreq").child(offerid);
+                dbref = FirebaseDatabase.getInstance().getReference().child("waitingreq").child(offerid).push();
                 Map<String, Object> requpdates = new HashMap<>();
-                requpdates.put("requestor", requestorid);
-                dbref.updateChildren(requpdates, new DatabaseReference.CompletionListener() {
+                dbref1.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
-                        Toast.makeText(getApplicationContext(),"requested "+proid,Toast.LENGTH_SHORT).show();
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Toast.makeText(getApplicationContext(),"already requested",Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            requpdates.put("requestid", pkey);
+                            requpdates.put("aord", "waiting");
+                            dbref.updateChildren(requpdates, new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                                    Toast.makeText(getApplicationContext(),"requested "+proid,Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });*/
+
             }
         });
         //offersavailablervadapter.setClickListener(this);

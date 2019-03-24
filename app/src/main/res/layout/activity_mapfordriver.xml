@@ -18,14 +18,25 @@
         map:mapType="normal" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/peoplefab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="20dp"
         android:src="@drawable/people"
-        map:backgroundTint="@color/colorPrimary"
-        map:maxImageSize="45dp" />
+        map:backgroundTint="@color/black"
+        map:maxImageSize="40dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/notifyfab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="100dp"
+        android:src="@drawable/notification"
+        map:backgroundTint="@color/black"
+        map:maxImageSize="40dp" />
 
 </android.support.design.widget.CoordinatorLayout>

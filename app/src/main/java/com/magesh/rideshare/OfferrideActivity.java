@@ -226,6 +226,7 @@ public class OfferrideActivity extends AppCompatActivity implements View.OnClick
                 }
             });
             Bundle b = new Bundle();
+            b.putString("oid", pkey);
             b.putDouble("orilat",orilat);
             b.putDouble("orilng",orilng);
             b.putDouble("deslat",deslat);

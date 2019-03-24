@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Toast;
 
 import com.directions.route.AbstractRouting;
@@ -68,6 +70,8 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
 
     String cloc = "cloc";
 
+    FloatingActionButton notifyfab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +81,7 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
 
         Bundle b = getIntent().getExtras();
 
+        String oid = b.getString("oid");
         double orilat = b.getDouble("orilat");
         double orilng = b.getDouble("orilng");
         double deslat = b.getDouble("deslat");
@@ -95,6 +100,17 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         fetchLastLocation();
+
+        notifyfab = findViewById(R.id.notifyfab);
+        notifyfab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle b = new Bundle();
+                b.putString("userid", userid);
+                b.putString("oid",oid);
+                startActivity(new Intent(getApplicationContext(), RequestedActivity.class).putExtras(b));
+            }
+        });
 
     }
 
@@ -258,7 +274,7 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
             Polyline polyline = mMap.addPolyline(polyOptions);
             polylines.add(polyline);
 
-            Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
         }
 
         MarkerOptions options = new MarkerOptions();

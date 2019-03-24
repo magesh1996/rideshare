@@ -24,22 +24,6 @@
             android:layout_marginTop="5dp">
 
             <TextView
-                android:id="@+id/oid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="offer id"
-                android:textStyle="bold"
-                android:background="@drawable/roundbg"
-                android:layout_marginLeft="8dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp">
-
-            <TextView
                 android:id="@+id/rname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -108,56 +92,15 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="car or bike :"
+                android:text="seats requesting :"
                 android:textStyle="bold"
                 android:layout_marginLeft="8dp"/>
 
             <TextView
-                android:id="@+id/cob"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="cob"
-                android:layout_marginLeft="8dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="seats available :"
-                android:textStyle="bold"
-                android:layout_marginLeft="8dp"/>
-
-            <TextView
-                android:id="@+id/sa"
+                android:id="@+id/sr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="seats"
-                android:layout_marginLeft="8dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="cost per seat : \u20B9"
-                android:textStyle="bold"
-                android:layout_marginLeft="8dp"/>
-
-            <TextView
-                android:id="@+id/cost"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="cost"
                 android:layout_marginLeft="8dp"/>
 
         </LinearLayout>
@@ -170,20 +113,20 @@
             android:gravity="center">
 
             <Button
-                android:id="@+id/req"
+                android:id="@+id/acc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:background="@drawable/roundedcornerbutton"
-                android:text="REQUEST" />
+                android:text="ACCEPT" />
 
             <Button
-                android:id="@+id/can"
+                android:id="@+id/dec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:background="@drawable/roundedcornerbutton"
-                android:text="CANCEL"
+                android:text="DECLINE"
                 android:enabled="false"/>
 
         </LinearLayout>

@@ -1,5 +1,6 @@
 package com.magesh.rideshare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,9 +32,10 @@ public class fragmentupcoming extends Fragment {
 
     private RecyclerView recyclerView;
 
+    List<upcoming> getListupcoming;
     List<upcoming> listupcoming;
 
-    DatabaseReference databaseReference1, databaseReference2;
+    DatabaseReference databaseReference1, databaseReference2, dbref;
 
     public fragmentupcoming(){
 
@@ -48,6 +51,8 @@ public class fragmentupcoming extends Fragment {
         final String cu = user.getUid();
 
         listupcoming = new ArrayList<>();
+        getListupcoming = new ArrayList<>();
+
         databaseReference1 = FirebaseDatabase.getInstance().getReference().child("offers");
         databaseReference1.orderByChild("uid").equalTo(cu).addValueEventListener(new ValueEventListener() {
 
@@ -60,9 +65,12 @@ public class fragmentupcoming extends Fragment {
                     String dor = data.child("dor").getValue(String.class);
                     String sa = data.child("sa").getValue(String.class);
                     String offorreq = "offered";
-                    listupcoming.add(new upcoming(ori, des, dor, sa, offorreq));
-                    listupcoming.sort(Comparator.comparing(upcoming::getDor));
+                    String offorreqid = data.getKey().toString();
+                    getListupcoming.add(new upcoming(ori, des, dor, sa, offorreq, offorreqid));
+                    getListupcoming.sort(Comparator.comparing(upcoming::getDor));
                 }
+                listupcoming.clear();
+                listupcoming.addAll(getListupcoming);
                 recyclerViewAdapter.notifyDataSetChanged();
             }
 
@@ -71,6 +79,8 @@ public class fragmentupcoming extends Fragment {
 
             }
         });
+
+
         databaseReference2 = FirebaseDatabase.getInstance().getReference().child("requests");
         databaseReference2.orderByChild("uid").equalTo(cu).addValueEventListener(new ValueEventListener() {
 
@@ -85,9 +95,12 @@ public class fragmentupcoming extends Fragment {
                     String dor = data.child("dor").getValue(String.class);
                     String sr = data.child("sr").getValue(String.class);
                     String offorreq = "requested";
-                    listupcoming.add(new upcoming(pic, dro, dor, sr, offorreq));
-                    listupcoming.sort(Comparator.comparing(upcoming::getDor));
+                    String offorreqid = data.getKey().toString();
+                    getListupcoming.add(new upcoming(pic, dro, dor, sr, offorreq, offorreqid));
+                    getListupcoming.sort(Comparator.comparing(upcoming::getDor));
                 }
+                listupcoming.clear();
+                listupcoming.addAll(getListupcoming);
                 recyclerViewAdapter.notifyDataSetChanged();
             }
 
@@ -106,11 +119,71 @@ public class fragmentupcoming extends Fragment {
 
         v = inflater.inflate(R.layout.upcoming,container,false);
         recyclerView = v.findViewById(R.id.upcomingrcview);
-        recyclerViewAdapter = new RecyclerViewAdapter(getContext(),listupcoming);
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), listupcoming, new RecyclerViewAdapter.ItemClickListener() {
+            @Override
+            public void onViewRide(View v, int i) {
+                String oorr = listupcoming.get(i).getOfforreq();
+                String oorrid = listupcoming.get(i).getOfforreqid();
+                if (oorr.equals("offered")){
+
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("offers").child(oorrid);
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            double orilat = dataSnapshot.child("orilat").getValue(Double.class);
+                            double orilng = dataSnapshot.child("orilng").getValue(Double.class);
+                            double deslat = dataSnapshot.child("deslat").getValue(Double.class);
+                            double deslng = dataSnapshot.child("deslng").getValue(Double.class);
+
+                            Bundle b = new Bundle();
+                            b.putString("oid",oorrid);
+                            b.putDouble("orilat",orilat);
+                            b.putDouble("orilng",orilng);
+                            b.putDouble("deslat",deslat);
+                            b.putDouble("deslng",deslng);
+                            startActivity(new Intent(getContext(),Mapfordriver.class).putExtras(b));
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                else {
+
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("requests").child(oorrid);
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            double orilat = dataSnapshot.child("piclat").getValue(Double.class);
+                            double orilng = dataSnapshot.child("piclng").getValue(Double.class);
+                            double deslat = dataSnapshot.child("drolat").getValue(Double.class);
+                            double deslng = dataSnapshot.child("drolng").getValue(Double.class);
+
+                            Bundle b1 = new Bundle();
+                            b1.putString("reqid",oorrid);
+                            b1.putDouble("orilat",orilat);
+                            b1.putDouble("orilng",orilng);
+                            b1.putDouble("deslat",deslat);
+                            b1.putDouble("deslng",deslng);
+                            startActivity(new Intent(getContext(),Mapforrequestor.class).putExtras(b1));
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+            }
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(recyclerViewAdapter);
         return v;
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
