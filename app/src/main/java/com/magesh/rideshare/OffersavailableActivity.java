@@ -115,7 +115,7 @@ public class OffersavailableActivity extends AppCompatActivity {
 
                             String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                             Ask ask = null;
-                            ask = new Ask(uid, pic, dro, dor, sr, piclat, piclng, drolat, drolng);
+                            ask = new Ask(uid, pic, dro, dor, sr, proid, piclat, piclng, drolat, drolng);
 
                             DatabaseReference databaseReference;
                             databaseReference = FirebaseDatabase.getInstance().getReference().child("requests");

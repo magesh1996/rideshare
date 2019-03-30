@@ -31,14 +31,18 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +73,8 @@ public class Mapforrequestor extends AppCompatActivity implements OnMapReadyCall
 
     String cloc = "cloc";
 
+    String reqid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +84,7 @@ public class Mapforrequestor extends AppCompatActivity implements OnMapReadyCall
 
         Bundle b = getIntent().getExtras();
 
+        reqid = b.getString("reqid");
         double orilat = b.getDouble("orilat");
         double orilng = b.getDouble("orilng");
         double deslat = b.getDouble("deslat");
@@ -96,6 +103,43 @@ public class Mapforrequestor extends AppCompatActivity implements OnMapReadyCall
         }
 
         fetchLastLocation();
+
+    }
+
+    private void showDriver() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("requests").child(reqid);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String driverid = dataSnapshot.child("proid").getValue(String.class);
+                    DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().child("users").child(driverid);
+                    GeoFire dricloc = new GeoFire(databaseReference1);
+                    dricloc.getLocation("cloc", new com.firebase.geofire.LocationCallback() {
+                        @Override
+                        public void onLocationResult(String key, GeoLocation location) {
+                            double drilat = location.latitude;
+                            double drilng = location.longitude;
+                            LatLng driloc = new LatLng(drilat, drilng);
+                            mMap.addMarker(new MarkerOptions().position(driloc).icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
+                            /*MarkerOptions reqmark = new MarkerOptions();
+                            reqmark.position(reqloc);
+                            reqmark.icon(BitmapDescriptorFactory.fromResource(R.drawable.personlocation));
+                            mMap.addMarker(reqmark);*/
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -189,9 +233,16 @@ public class Mapforrequestor extends AppCompatActivity implements OnMapReadyCall
         mMap.setMyLocationEnabled(true);
         mMap.setPadding(0,70,0,0);
 
-        route();
+        /*if (personmarker != null){
+            personmarker.remove();
+        }
+        personmarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.personlocation)));*/
 
+        route();
+        showDriver();
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -212,13 +263,14 @@ public class Mapforrequestor extends AppCompatActivity implements OnMapReadyCall
         latLng = new LatLng(location.getLatitude(),location.getLongitude());
 
         geoFire.setLocation(cloc, new GeoLocation(location.getLatitude(),location.getLongitude()));
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        geoFire.removeLocation(cloc);
+        //geoFire.removeLocation(cloc);
     }
 
     @Override

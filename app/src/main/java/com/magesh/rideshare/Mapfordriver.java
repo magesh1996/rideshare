@@ -4,7 +4,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -32,14 +34,19 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +79,10 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
 
     FloatingActionButton notifyfab;
 
+    String oid;
+
+    Marker carmarker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,11 +92,12 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
 
         Bundle b = getIntent().getExtras();
 
-        String oid = b.getString("oid");
+        oid = b.getString("oid");
         double orilat = b.getDouble("orilat");
         double orilng = b.getDouble("orilng");
         double deslat = b.getDouble("deslat");
         double deslng = b.getDouble("deslng");
+
 
         start = new LatLng(orilat,orilng);
         end = new LatLng(deslat, deslng);
@@ -109,6 +121,48 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
                 b.putString("userid", userid);
                 b.putString("oid",oid);
                 startActivity(new Intent(getApplicationContext(), RequestedActivity.class).putExtras(b));
+            }
+        });
+
+    }
+
+    private void showRequestors() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("offers").child(oid).child("reqs");
+        databaseReference.orderByChild("aord").equalTo("accepted").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    String requestorid = data.child("requestorid").getValue(String.class);
+                    assert requestorid != null;
+                    DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().child("users").child(requestorid);
+                    GeoFire reqcloc = new GeoFire(databaseReference1);
+                    reqcloc.getLocation("cloc", new com.firebase.geofire.LocationCallback() {
+                        @Override
+                        public void onLocationResult(String key, GeoLocation location) {
+                            double reqlat = location.latitude;
+                            double reqlng = location.longitude;
+                            LatLng reqloc = new LatLng(reqlat, reqlng);
+                            mMap.addMarker(new MarkerOptions().position(reqloc).icon(BitmapDescriptorFactory.fromResource(R.drawable.personlocation)));
+                            /*MarkerOptions reqmark = new MarkerOptions();
+                            reqmark.position(reqloc);
+                            reqmark.icon(BitmapDescriptorFactory.fromResource(R.drawable.personlocation));
+                            mMap.addMarker(reqmark);*/
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
 
@@ -201,10 +255,16 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(false);
         mMap.setPadding(0,70,0,0);
 
+        if (carmarker != null){
+            carmarker.remove();
+        }
+        carmarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
+
         route();
+        showRequestors();
 
     }
 
@@ -222,6 +282,7 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
     @Override
     public void onLocationChanged(Location location) {
         latLng = new LatLng(location.getLatitude(),location.getLongitude());
@@ -233,7 +294,7 @@ public class Mapfordriver extends AppCompatActivity implements OnMapReadyCallbac
     protected void onStop() {
         super.onStop();
 
-        geoFire.removeLocation(cloc);
+        //geoFire.removeLocation(cloc);
     }
 
     @Override
